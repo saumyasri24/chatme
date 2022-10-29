@@ -24,13 +24,7 @@ io.on('connection', socket => {
   socket.on('joinRoom', ({ username, room }) => {
     const user = userJoin(socket.id, username, room);
 
-    socket.join(user.room);
-
-    // Welcome current user
-    socket.emit('message', formatMessage(botName, 'Welcome to Chatsper!'));
-
-    // Broadcast when a user connects
-    socket.broadcast
+    socket.join(user.room).emit('message', formatMessage(botName, 'Welcome to Chatsper!')).broadcast
       .to(user.room)
       .emit(
         'message',
@@ -59,10 +53,7 @@ io.on('connection', socket => {
       io.to(user.room).emit(
         'message',
         formatMessage(botName, `${user.username} has left the chat`)
-      );
-
-      // Send users and room info
-      io.to(user.room).emit('roomUsers', {
+      ).to(user.room).emit('roomUsers', {
         room: user.room,
         users: getRoomUsers(user.room)
       });
